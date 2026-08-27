@@ -1056,13 +1056,30 @@
       return true;
     }
 
-    function pickQuestion() {
-      const questions = CONFIG.preguntas || [];
-      currentQuestion = questions.length
-        ? questions[Math.floor(Math.random() * questions.length)]
-        : 'Cuenta un detalle importante del libro.';
-      document.getElementById('questionBox').textContent = currentQuestion;
+    async function pickQuestion() {
+  const questionBox = document.getElementById('questionBox');
+  questionBox.textContent = 'Cargando reto sorpresa...';
+
+  const grupoSeleccionado = document.getElementById('grupo').value || '6ºA';
+
+  try {
+    const response = await fetch(`${APPS_SCRIPT_URL}?grupo=${encodeURIComponent(grupoSeleccionado)}`);
+    const data = await response.json();
+
+    if (data.ok && Array.isArray(data.preguntas) && data.preguntas.length > 0) {
+      CONFIG.preguntas = data.preguntas;
     }
+  } catch (error) {
+    // Si falla la conexión, la web utilizará automáticamente la lista fija de respaldo en CONFIG
+  }
+
+  const questions = CONFIG.preguntas || [];
+  currentQuestion = questions.length
+    ? questions[Math.floor(Math.random() * questions.length)]
+    : 'Cuenta un detalle importante del libro.';
+
+  questionBox.textContent = currentQuestion;
+}
 
     function setResponseMode(mode) {
       responseMode = mode;
