@@ -958,13 +958,13 @@
       };
 
       try {
-        const transportForm = document.getElementById('transportForm');
-        const transportPayload = document.getElementById('transportPayload');
-        transportForm.action = saveUrl;
-        transportPayload.value = JSON.stringify(payload);
-        transportForm.submit();
-
-        setTimeout(() => {
+        fetch(saveUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        })
+        .then(() => {
           form.classList.remove('loading');
           submitBtn.textContent = 'Registrar mi lectura';
           submitBtn.disabled = false;
@@ -973,7 +973,13 @@
               ? '¡Lectura enviada! El audio se está guardando en Drive.'
               : '¡Lectura enviada correctamente!'
           );
-        }, 1800);
+        })
+        .catch(() => {
+          form.classList.remove('loading');
+          submitBtn.textContent = 'Registrar mi lectura';
+          submitBtn.disabled = false;
+          showMessage('No se ha podido enviar la lectura. Revisa la conexión.', 'error');
+        });
       } catch (error) {
         form.classList.remove('loading');
         submitBtn.textContent = 'Registrar mi lectura';
